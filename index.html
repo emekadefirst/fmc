@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Continue with Google</title>
+  <meta name="google-signin-client_id" content="251970702041-ps1c9tfso7cian4ouj89llg57qkceo7s.apps.googleusercontent.com">
+  <script src="https://accounts.google.com/gsi/client" async defer></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .container {
+      text-align: center;
+      padding: 40px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    #message {
+      margin-top: 20px;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Login with Google</h2>
+    <div id="g_id_onload"
+         data-client_id="251970702041-ps1c9tfso7cian4ouj89llg57qkceo7s.apps.googleusercontent.com"
+         data-context="signin"
+         data-callback="handleCredentialResponse"
+         data-auto_prompt="false">
+    </div>
+    
+    <div class="g_id_signin" data-type="standard"></div>
+    
+    <div id="message"></div>
+  </div>
+
+  <script>
+    function handleCredentialResponse(response) {
+      const id_token = response.credential;
+      fetch("http://127.0.0.1:8000/users/v1/auth-google/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ access_token: id_token })
+      })
+      console.log(res.json())
+      .then(res => res.json())
+      .then(data => {
+        const msg = document.getElementById("message");
+        if (data.access_token) {
+          msg.textContent = "Login successful! Access Token: " + data.access_token;
+        } else {
+          msg.textContent = "Error: " + JSON.stringify(data);
+          msg.style.color = "red";
+        }
+      })
+      .catch(error => {
+        document.getElementById("message").textContent = "Network error: " + error;
+      });
+    }
+  </script>
+</body>
+</html>
